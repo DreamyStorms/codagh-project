@@ -1,2 +1,2 @@
-# codagh-project
+# Codagh Project
 High School thesis project on creating a neural network chess bot and comparing it to LLMs.
