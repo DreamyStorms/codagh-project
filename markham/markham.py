@@ -17,19 +17,16 @@ def pgn_to_fen(game_dir): # Takes in directory to .pgn and returns a list of [bo
     return fen
 
 def main(): # Handels arguments and redirects to the specified operation 
-    if len(sys.argv) == 1:
-        print("ERROR: No arguments")
-
-    operation = sys.argv[1]
-
-    match operation:
-        case "pgn-fen":
-            if len(sys.argv) != 3:
-                print("ERROR: Incrorect number of arguments")
-                return 4
-            else:
-                print(pgn_to_fen(sys.argv[2]))
-                return 2
+    match len(sys.argv):
+        case 1:
+            raise TypeError("Markham takes 1 postional argument but none were given")
+        case 2:
+            print(pgn_to_fen(sys.argv[1]))
+        case 3:
+            raise NotImplementedError
+        case _:
+            raise TypeError("Markham takes 1 positional and 1 optional arguments but " + str(len(sys.argv)-1) + " were given")
+    
 
 
-print(main())
+main()
