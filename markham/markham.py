@@ -1,8 +1,15 @@
 import os
 import sys
 import sqlite3
+from pathlib import Path
 import chess
 import chess.pgn
+
+con = sqlite3.connect(Path('lib') / 'data' / 'data.db')
+cur = con.cursor()
+cur.execute("SELECT name FROM sqlite_master WHERE type ='table' and name = 'raw'")
+if cur.fetchone == None:
+    cur.execute("CREATE TABLE raw(board, move)")
 
 def pgn_to_fen(game_dir): # Takes in directory to .pgn and returns a list of [board position, move]
     pgn = open(game_dir)
@@ -12,7 +19,7 @@ def pgn_to_fen(game_dir): # Takes in directory to .pgn and returns a list of [bo
     fen = []
 
     for move in game.mainline_moves():
-        fen.append([board.fen(), move.uci()])
+        fen.append((board.fen(), move.uci()))
         board.push(move)
     return fen
 
@@ -22,10 +29,24 @@ def main(): # Handels arguments and redirects to the specified operation
             raise TypeError("Markham takes 1 postional argument but none were given")
         case 2:
             print(pgn_to_fen(sys.argv[1]))
-        case 3:
-            raise NotImplementedError
         case _:
-            raise TypeError("Markham takes 1 positional and 1 optional arguments but " + str(len(sys.argv)-1) + " were given")
+            out_to_db = False
+            folder_in = False
+
+            for i in range(2, len(sys.argv) - 1):
+                match sys.argv[i]:
+                    case "-o":
+                        out_to_db = True
+                    case "-f":
+                        folder_in = True
+                    case _:
+                        raise ValueError("Unknown argument " + "\"" + sys.argv[i] + "\"")
+            if folder_in:
+                raise NotImplementedError
+            else:
+                cur.executemany("INSERT INTO raw VALUES(?, ?)", pgn_to_fen(sys.argv[1]))
+                con.commit()
+
     
 
 
