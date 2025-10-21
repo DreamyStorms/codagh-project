@@ -135,8 +135,9 @@ def main():
                 raise FileNotFoundError
             
             con = connect_db_from_pgn_path(path)
-            if not db_table_exist(con, "selected_games"):
-                raise ValueError("No games selected from " + path.name)
+            if not db_table_exist(con, "selected_games") or db_table_empty(con, "selected_games"):
+                print("No games selected from " + PurePath(path).name)
+                return
             
             if not querry_response_yes("Are you sure?"):
                 print("Operation aborted")
