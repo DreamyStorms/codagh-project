@@ -26,6 +26,8 @@ def select_games(pgn_path: str, min_rating: int) -> None: # Creates a db with of
     if not db_table_exist(con, "selected_games"):
         cur.execute("CREATE TABLE selected_games(offset)")
     
+    number_of_games_selected = 0
+
     while True:
         offset = pgn.tell()
 
@@ -37,6 +39,11 @@ def select_games(pgn_path: str, min_rating: int) -> None: # Creates a db with of
         if headers.get("WhiteElo") > min_rating and headers.get("BlackElo") > min_rating:
             cur.execute(f"INSERT INTO selected_games VALUES({offset})")
             con.commit()
+            number_of_games_selected += 1
+            
+    
+    print(f"{number_of_games_selected} games selected")
+    
     return
 
 def clear_db_table(db_con: sqlite3.Connection, table_name: str) -> None: # Clears a specified table in the provided db
