@@ -6,10 +6,16 @@ from pathlib import PurePath
 import chess
 import chess.pgn
 
-def connect_db_from_pgn_path(pgn_path: str) -> sqlite3.Connection: # Creates a db connection from the provided pgn path
-    path = PurePath(pgn_path)
+def path_is_file(path: str) -> bool:
+    if not Path(path).is_file():
+        return False
+    else:
+        return True
 
-    con = sqlite3.connect(Path('lib') / 'data' / 'pgn' / (path.stem + ".db"))
+def connect_db_from_pgn_path(pgn_path: str) -> sqlite3.Connection: # Creates a db connection from the provided pgn path
+    path_is_file(pgn_path)
+
+    con = sqlite3.connect(Path('lib') / 'data' / 'pgn' / (PurePath(pgn_path).stem + ".db"))
     return con
 
 def select_games(pgn_path: str, min_rating: int) -> None: # Creates a db with offsets form games above the minimum rating i the provided pgn
@@ -74,6 +80,8 @@ def main():
 
     match operation:
         case "select-games": # (path, minnimum_rating)
+            if not path_is_file(sys.argv[2]):
+                raise FileNotFoundError
             select_games(sys.argv[2], sys.argv[3])
         case "clear-selected":
             pass
