@@ -94,7 +94,25 @@ def main():
             return
 
         case "clear-selected":
-            pass
+            path = sys.argv[2]
+
+            if not path_is_file(path):
+                raise FileNotFoundError
+            
+            con = connect_db_from_pgn_path(path)
+            if not db_table_exist(con, "selected_games"):
+                raise ValueError("No games selected from " + path.name)
+            
+            res = input("Are you sure? (y/N)\n")
+            if res.casefold() != "yes" and res.casefold() != "y":
+                print("Operation aborted")
+                return
+            
+            clear_db_table(con, "selected_games")
+
+            return
+
+
         case "parse-selected":
             pass
 
