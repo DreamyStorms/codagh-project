@@ -23,7 +23,7 @@ def select_games(pgn_path: str, min_rating: int) -> None: # Creates a db with of
 
     con = connect_db_from_pgn_path(pgn_path)
     cur = con.cursor()
-    if not db_table_exist(cur, "selected_games"):
+    if not db_table_exist(con, "selected_games"):
         cur.execute("CREATE TABLE selected_games(offset)")
     
     while True:
@@ -54,7 +54,8 @@ def game_to_fen_and_move(game: chess.pgn.Game) -> list[list[str, str]]: # Return
 
     return fen
 
-def db_table_exist(cur: sqlite3.Cursor, table_name: str) -> bool: # Returns True if the table exists in the provided db
+def db_table_exist(con: sqlite3.Connection, table_name: str) -> bool: # Returns True if the table exists in the provided db
+    cur = con.cursor()
     res = cur.execute(f"SELECT name FROM sqlite_master WHERE type ='table' and name = '{table_name}'")
     if res.fetchone() is None:
         return False
@@ -68,7 +69,7 @@ def cli():
 def main():
     con = sqlite3.connect(Path('lib') / 'data' / 'data.db')
     cur = con.cursor()
-    if not db_table_exist(cur, "raw"):
+    if not db_table_exist(con, "raw"):
         cur.execute("CREATE TABLE raw(board, move)")
     
     if len(sys.argv) < 2:
