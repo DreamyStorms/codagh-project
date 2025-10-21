@@ -87,6 +87,8 @@ def main():
                 raise FileNotFoundError
             select_games(path, min_rating)
 
+            return
+
         case "clear-selected":
             pass
         case "parse-selected":
