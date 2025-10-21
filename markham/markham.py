@@ -6,6 +6,13 @@ from pathlib import PurePath
 import chess
 import chess.pgn
 
+def querry_response_yes(querry: str) -> bool:
+    res = input(querry)
+    if res.casefold() == "yes" or res.casefold() == "y":
+        return True
+    else:
+        return False
+
 def path_is_file(path: str) -> bool:
     if not Path(path).is_file():
         return False
@@ -121,8 +128,7 @@ def main():
             if not db_table_exist(con, "selected_games"):
                 raise ValueError("No games selected from " + path.name)
             
-            res = input("Are you sure? (y/N)\n")
-            if res.casefold() != "yes" and res.casefold() != "y":
+            if not querry_response_yes("Are you sure? (y/N)\n"):
                 print("Operation aborted")
                 return
             
