@@ -160,8 +160,19 @@ def main():
 
             return
 
-
         case "parse-selected":
-            pass
+            path = sys.argv[2]
+
+            if not path_is_file(path):
+                raise FileNotFoundError
+            
+            selected_games_db_con = connect_db_from_pgn_path(path)
+            if not db_table_exist(selected_games_db_con, "selected_games") or db_table_empty(selected_games_db_con, "selected_games"):
+                print("No games selected from " + PurePath(path).name)
+                return
+            
+            parse_selected_games(path, con)
+
+            return
 
 main()
