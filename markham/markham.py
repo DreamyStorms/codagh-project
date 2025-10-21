@@ -40,7 +40,11 @@ def select_games(pgn_path: str, min_rating: int) -> None: # Creates a db with of
     return
 
 def clear_db_table(db_con: sqlite3.Connection, table_name: str) -> None: # Clears a specified table in the provided db
-    cur = db_con.cursor
+    cur = db_con.cursor()
+    
+    cur.execute(f"DELETE FROM {table_name} WHERE 1=1")
+    db_con.commit()
+
     return
 
 def game_to_fen_and_move(game: chess.pgn.Game) -> list[list[str, str]]: # Returns a 2d list of every board position and move
