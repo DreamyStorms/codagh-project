@@ -114,6 +114,16 @@ def main():
 
             if not path_is_file(path):
                 raise FileNotFoundError
+            
+            con = connect_db_from_pgn_path(path)
+            
+            if not db_table_empty(con, "selected_games"):
+                if not querry_response_yes(f"This will clear the selection for {PurePath(path).name} do you want to proceed?"):
+                    print("Operation aborted")
+                    return
+                else:
+                    clear_db_table(con, "selected_games")
+                    
             select_games(path, min_rating)
 
             return
