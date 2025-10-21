@@ -43,9 +43,7 @@ def clear_db_table(db_con: sqlite3.Connection, table_name: str) -> None: # Clear
     cur = db_con.cursor
     return
 
-def pgn_to_fen(game_dir): # Takes in directory to .pgn and returns a list of [board position, move]
-    pgn = open(game_dir)
-    game = chess.pgn.read_game(pgn)
+def game_to_fen_and_move(game: chess.pgn.Game) -> list[list[str, str]]: # Returns a 2d list of every board position and move
     board = game.board()
 
     fen = []
