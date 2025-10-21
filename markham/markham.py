@@ -115,14 +115,14 @@ def main():
             if not path_is_file(path):
                 raise FileNotFoundError
             
-            con = connect_db_from_pgn_path(path)
+            selected_games_db_con = connect_db_from_pgn_path(path)
             
-            if not db_table_empty(con, "selected_games"):
+            if not db_table_empty(selected_games_db_con, "selected_games"):
                 if not querry_response_yes(f"This will clear the selection for {PurePath(path).name} do you want to proceed?"):
                     print("Operation aborted")
                     return
                 else:
-                    clear_db_table(con, "selected_games")
+                    clear_db_table(selected_games_db_con, "selected_games")
                     
             select_games(path, min_rating)
 
@@ -134,8 +134,8 @@ def main():
             if not path_is_file(path):
                 raise FileNotFoundError
             
-            con = connect_db_from_pgn_path(path)
-            if not db_table_exist(con, "selected_games") or db_table_empty(con, "selected_games"):
+            selected_games_db_con = connect_db_from_pgn_path(path)
+            if not db_table_exist(selected_games_db_con, "selected_games") or db_table_empty(selected_games_db_con, "selected_games"):
                 print("No games selected from " + PurePath(path).name)
                 return
             
@@ -143,7 +143,7 @@ def main():
                 print("Operation aborted")
                 return
             
-            clear_db_table(con, "selected_games")
+            clear_db_table(selected_games_db_con, "selected_games")
 
             return
 
