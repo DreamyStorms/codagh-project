@@ -94,6 +94,19 @@ def db_table_empty(con: sqlite3.Connection, table_name: str) -> bool:
 def cli():
     raise NotImplementedError
 
+def parse_selected_games(pgn_path: str, main_db_con: sqlite3.Connection):
+    selected_games_db_con = connect_db_from_pgn_path(pgn_path)
+    selected_games_db_cur = selected_games_db_con.cursor()
+    main_db_cur = main_db_con.cursor()
+
+    pgn = open(pgn_path)
+
+    for row in selected_games_db_cur.execute("SELECT offset FROM selected_games").fetchall():
+        pgn.seek(row[0])
+        main_db_cur.executemany("INSERT INTO raw VALUES(?, ?)", game_to_fen_and_move(chess.pgn.read_game(pgn))) 
+        main_db_con.commit()
+        
+    return
 
 def main():
     con = sqlite3.connect(Path('lib') / 'data' / 'data.db')
