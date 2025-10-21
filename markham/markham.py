@@ -1,4 +1,5 @@
 import os
+import time
 import sys
 import sqlite3
 from pathlib import Path
@@ -33,23 +34,29 @@ def select_games(pgn_path: str, min_rating: int) -> None: # Creates a db with of
     if not db_table_exist(con, "selected_games"):
         cur.execute("CREATE TABLE selected_games(offset)")
     
-    number_of_games_selected = 0
+    number_of_games_processed = 0
+    start_time = time.time_ns()
+    batch_size = 10000
+    games_left_to_process = True
 
-    while True:
-        offset = pgn.tell()
+    while games_left_to_process:
+        number_of_games_processed += batch_size
+        for i in range(batch_size):
+            offset = pgn.tell()
+            headers = chess.pgn.read_headers(pgn)
 
-        headers = chess.pgn.read_headers(pgn)
+            if headers is None:
+                games_left_to_process = False
+                number_of_games_processed -= (batch_size - (i + 1))
+                break
 
-        if headers is None:
-            break
-
-        if headers.get("WhiteElo") > min_rating and headers.get("BlackElo") > min_rating:
-            cur.execute(f"INSERT INTO selected_games VALUES({offset})")
-            con.commit()
-            number_of_games_selected += 1
-            
-    
-    print(f"{number_of_games_selected} games selected")
+            if headers.get("WhiteElo") > min_rating or headers.get("BlackElo") > min_rating:
+                cur.execute(f"INSERT INTO selected_games VALUES({offset})")
+        
+        con.commit()
+        sys.stdout.write("\r")
+        sys.stdout.write(f"\r{number_of_games_processed} games processed in {round((time.time_ns() - start_time) / 1000000000, 1)}s ({round((number_of_games_processed / ((time.time_ns() - start_time) / 1000000000)), 2)})/s")
+        sys.stdout.flush()
     
     return
 
