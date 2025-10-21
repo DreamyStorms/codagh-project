@@ -6,12 +6,16 @@ from pathlib import PurePath
 import chess
 import chess.pgn
 
-
-def select_games(pgn_path, min_rating):
+def connect_db_from_pgn_path(pgn_path):
     path = PurePath(pgn_path)
-    pgn = open(path)
 
     con = sqlite3.connect(Path('lib') / 'data' / 'pgn' / (path.stem + ".db"))
+    return con
+
+def select_games(pgn_path, min_rating):
+    pgn = open(pgn_path)
+
+    con = connect_db_from_pgn_path(pgn_path)
     cur = con.cursor()
     if not db_table_exist(cur, "selected_games"):
         cur.execute("CREATE TABLE selected_games(offset)")
@@ -72,6 +76,4 @@ def main():
         case "parse-selected":
             pass
 
-    
-    
 main()
