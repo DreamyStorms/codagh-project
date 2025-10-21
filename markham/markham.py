@@ -53,6 +53,7 @@ def pgn_to_fen(game_dir): # Takes in directory to .pgn and returns a list of [bo
     for move in game.mainline_moves():
         fen.append((board.fen(), move.uci()))
         board.push(move)
+
     return fen
 
 def db_table_exist(cur: sqlite3.Cursor, table_name: str) -> bool: # Returns True if the table exists in the provided db
@@ -80,9 +81,13 @@ def main():
 
     match operation:
         case "select-games": # (path, minnimum_rating)
-            if not path_is_file(sys.argv[2]):
+            path = sys.argv[2]
+            min_rating = sys.argv[3]
+
+            if not path_is_file(path):
                 raise FileNotFoundError
-            select_games(sys.argv[2], sys.argv[3])
+            select_games(path, min_rating)
+
         case "clear-selected":
             pass
         case "parse-selected":
