@@ -72,7 +72,18 @@ def db_table_exist(con: sqlite3.Connection, table_name: str) -> bool: # Returns 
         return False
     else:
         return True
+
+def db_table_empty(con: sqlite3.Connection, table_name: str) -> bool:
+    if not db_table_exist(con, table_name):
+        raise ValueError(f"No table {table_name}")
     
+    cur = con.cursor()
+    res = cur.execute(f"SELECT * FROM {table_name} WHERE 1=1 LIMIT 1")
+    if res.fetchone() is None:
+        return True
+    else:
+        return False
+
 def cli():
     raise NotImplementedError
 
