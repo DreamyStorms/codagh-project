@@ -7,7 +7,7 @@ import chess
 import chess.pgn
 
 def querry_response_yes(querry: str) -> bool:
-    res = input(querry)
+    res = input(f"{querry} (y/N)\n")
     if res.casefold() == "yes" or res.casefold() == "y":
         return True
     else:
@@ -128,7 +128,7 @@ def main():
             if not db_table_exist(con, "selected_games"):
                 raise ValueError("No games selected from " + path.name)
             
-            if not querry_response_yes("Are you sure? (y/N)\n"):
+            if not querry_response_yes("Are you sure?"):
                 print("Operation aborted")
                 return
             
