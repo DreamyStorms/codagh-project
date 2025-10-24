@@ -78,7 +78,7 @@ def clear_db_table(db_con: sqlite3.Connection, table_name: str) -> None: # Clear
 
     return
 
-def game_data(game: chess.pgn.Game) -> list[list[str, str]]: # Returns a 2d list of every board position and move
+def game_data(game: chess.pgn.Game) -> list[(str, str, str)]: # Returns a list of tupples whith data for evry move in the game
     board = game.board()
 
     data = []
