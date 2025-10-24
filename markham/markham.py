@@ -1,5 +1,3 @@
-import os
-import time
 import sys
 import sqlite3
 from tqdm import tqdm
