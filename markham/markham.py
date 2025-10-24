@@ -61,7 +61,7 @@ def select_games(pgn_path: str, min_rating: int) -> None: # Creates a db with of
         print("")
     
     for row in tqdm(cur.execute("SELECT offset, white_elo, black_elo FROM all_games").fetchall()):
-        if row[1] > min_rating and row[2] > min_rating:
+        if row[1] >= min_rating and row[2] >= min_rating:
             cur.execute(f"INSERT INTO selected_games VALUES({row[0]})")
     
     con.commit()
