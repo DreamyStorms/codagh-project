@@ -9,6 +9,7 @@ import chess.pgn
 
 def querry_response_yes(querry: str) -> bool: # Reurns True if user responds y or yes to the pecified query
     res = input(f"{querry} (y/N)\n")
+    print("")
     if res.casefold() == "yes" or res.casefold() == "y":
         return True
     else:
@@ -56,9 +57,7 @@ def select_games(pgn_path: str, min_rating: int) -> None: # Creates a db with of
                 cur.execute("INSERT INTO all_games VALUES(?, ?, ?)", value)
 
             con.commit()
-            print(f"{games_found} games found.")
-
-        print("")
+            print(f"{games_found} games found.\n")
     
     print("Selecting games...")
 
@@ -68,7 +67,7 @@ def select_games(pgn_path: str, min_rating: int) -> None: # Creates a db with of
     
     con.commit()
     res = cur.execute("SELECT COUNT (*) FROM selected_games")
-    print(f"{res.fetchone()[0]} games selected.")
+    print(f"{res.fetchone()[0]} games selected.\n")
     
     return
 
@@ -157,7 +156,7 @@ def main():
             
             if not db_table_empty(selected_games_db_con, "selected_games"):
                 if not querry_response_yes(f"This will clear the selection for {PurePath(path).name} do you want to proceed?"):
-                    print("Operation aborted")
+                    print("Operation aborted\n")
                     return
                 else:
                     clear_db_table(selected_games_db_con, "selected_games")
@@ -181,7 +180,7 @@ def main():
                 return
             
             if not querry_response_yes("Are you sure?"):
-                print("Operation aborted")
+                print("Operation aborted\n")
                 return
             
             clear_db_table(selected_games_db_con, "selected_games")
@@ -199,7 +198,7 @@ def main():
             
             selected_games_db_con = connect_db_from_pgn_path(path)
             if not db_table_exist(selected_games_db_con, "selected_games") or db_table_empty(selected_games_db_con, "selected_games"):
-                print("No games selected from " + PurePath(path).name)
+                print(f"No games selected from {PurePath(path).name}\n")
                 return
             
             parse_selected_games(path, con)
