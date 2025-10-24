@@ -110,9 +110,6 @@ def db_table_empty(con: sqlite3.Connection, table_name: str) -> bool:
     else:
         return False
 
-def cli():
-    raise NotImplementedError
-
 def parse_selected_games(pgn_path: str, main_db_con: sqlite3.Connection):
     selected_games_db_con = connect_db_from_pgn_path(pgn_path)
     selected_games_db_cur = selected_games_db_con.cursor()
@@ -132,10 +129,6 @@ def main():
     cur = con.cursor()
     if not db_table_exist(con, "raw"):
         cur.execute("CREATE TABLE raw(board, move)")
-    
-    if len(sys.argv) < 2:
-        cli()
-        return
     
     operation = sys.argv[1]
 
