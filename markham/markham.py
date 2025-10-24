@@ -130,15 +130,27 @@ def main():
     if not db_table_exist(con, "raw"):
         cur.execute("CREATE TABLE raw(board, move)")
     
+    if len(sys.argv) <= 2:
+        raise TypeError("missing required argument \"operation\" (pos 1)")
+    
     operation = sys.argv[1]
 
     match operation:
         case "select-games": # (path, minnimum_rating)
+            if len(sys.argv) == 3:
+                raise TypeError(("missing required argument \"min-rating\" (pos 3)"))
+            elif len(sys.argv) == 2:
+                raise TypeError(("missing required argument \"path\" (pos 2)"))
+
             path = sys.argv[2]
             min_rating = sys.argv[3]
 
             if not path_is_file(path):
                 raise FileNotFoundError
+            try:
+                int(min_rating)
+            except:
+                raise TypeError("min-rating must be an int")
             
             selected_games_db_con = connect_db_from_pgn_path(path)
             
@@ -154,6 +166,9 @@ def main():
             return
 
         case "clear-selected":
+            if len(sys.argv) == 2:
+                raise TypeError(("missing required argument \"path\" (pos 2)"))
+            
             path = sys.argv[2]
 
             if not path_is_file(path):
@@ -173,6 +188,9 @@ def main():
             return
 
         case "parse-selected":
+            if len(sys.argv) == 2:
+                raise TypeError(("missing required argument \"path\" (pos 2)"))
+            
             path = sys.argv[2]
 
             if not path_is_file(path):
