@@ -3,6 +3,7 @@ import time
 import sys
 import sqlite3
 from tqdm import tqdm
+from tqdm import trange
 from pathlib import Path
 from pathlib import PurePath
 import chess
@@ -32,32 +33,42 @@ def select_games(pgn_path: str, min_rating: int) -> None: # Creates a db with of
 
     con = connect_db_from_pgn_path(pgn_path)
     cur = con.cursor()
+    if not db_table_exist(con, "all_games"):
+        cur.execute("CREATE TABLE all_games(offset, white_elo, black_elo)")
     if not db_table_exist(con, "selected_games"):
         cur.execute("CREATE TABLE selected_games(offset)")
     
-    number_of_games_processed = 0
-    start_time = time.time_ns()
-    batch_size = 10000
-    games_left_to_process = True
+    if db_table_empty(con, "all_games"):
+        print("Searching for games...")
+        games_found = 0
+        batch_size = 100000
+        games_left_to_process = True
+        while games_left_to_process:
+            games_found += batch_size
+            for i in trange(batch_size):
+                offset = pgn.tell()
+                headers = chess.pgn.read_headers(pgn)
 
-    while games_left_to_process:
-        number_of_games_processed += batch_size
-        for i in range(batch_size):
-            offset = pgn.tell()
-            headers = chess.pgn.read_headers(pgn)
+                if headers is None:
+                    games_left_to_process = False
+                    games_found -= (batch_size - (i + 1))
+                    break
+                
+                value = (offset, headers.get("WhiteElo", "?"), headers.get("BlackElo", "?"))
+                cur.execute("INSERT INTO all_games VALUES(?, ?, ?)", value)
 
-            if headers is None:
-                games_left_to_process = False
-                number_of_games_processed -= (batch_size - (i + 1))
-                break
+            con.commit()
+            print(f"{games_found} games found.")
 
-            if headers.get("WhiteElo") > min_rating or headers.get("BlackElo") > min_rating:
-                cur.execute(f"INSERT INTO selected_games VALUES({offset})")
-        
-        con.commit()
-        sys.stdout.write("\r")
-        sys.stdout.write(f"\r{number_of_games_processed} games processed in {round((time.time_ns() - start_time) / 1000000000, 1)}s ({round((number_of_games_processed / ((time.time_ns() - start_time) / 1000000000)), 2)})/s")
-        sys.stdout.flush()
+        print("")
+    
+    for row in tqdm(cur.execute("SELECT offset, white_elo, black_elo FROM all_games").fetchall()):
+        if row[1] > min_rating and row[2] > min_rating:
+            cur.execute(f"INSERT INTO selected_games VALUES({row[0]})")
+    
+    con.commit()
+    res = cur.execute("SELECT COUNT (*) FROM selected_games")
+    print(f"{res.fetchone()[0]} games selected.")
     
     return
 
