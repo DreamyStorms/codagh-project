@@ -2,6 +2,7 @@ import os
 import time
 import sys
 import sqlite3
+from tqdm import tqdm
 from pathlib import Path
 from pathlib import PurePath
 import chess
@@ -108,7 +109,7 @@ def parse_selected_games(pgn_path: str, main_db_con: sqlite3.Connection):
 
     pgn = open(pgn_path)
 
-    for row in selected_games_db_cur.execute("SELECT offset FROM selected_games").fetchall():
+    for row in tqdm(selected_games_db_cur.execute("SELECT offset FROM selected_games").fetchall()):
         pgn.seek(row[0])
         main_db_cur.executemany("INSERT INTO raw VALUES(?, ?)", game_to_fen_and_move(chess.pgn.read_game(pgn))) 
         main_db_con.commit()
