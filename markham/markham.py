@@ -7,14 +7,14 @@ from pathlib import PurePath
 import chess
 import chess.pgn
 
-def querry_response_yes(querry: str) -> bool:
+def querry_response_yes(querry: str) -> bool: # Reurns True if user responds y or yes to the pecified query
     res = input(f"{querry} (y/N)\n")
     if res.casefold() == "yes" or res.casefold() == "y":
         return True
     else:
         return False
 
-def path_is_file(path: str) -> bool:
+def path_is_file(path: str) -> bool: # Returns True if the path leads to a file
     if not Path(path).is_file():
         return False
     else:
@@ -98,7 +98,7 @@ def db_table_exist(con: sqlite3.Connection, table_name: str) -> bool: # Returns 
     else:
         return True
 
-def db_table_empty(con: sqlite3.Connection, table_name: str) -> bool:
+def db_table_empty(con: sqlite3.Connection, table_name: str) -> bool: # Returns True if the table is empty
     if not db_table_exist(con, table_name):
         return True
     
@@ -109,7 +109,7 @@ def db_table_empty(con: sqlite3.Connection, table_name: str) -> bool:
     else:
         return False
 
-def parse_selected_games(pgn_path: str, main_db_con: sqlite3.Connection):
+def parse_selected_games(pgn_path: str, main_db_con: sqlite3.Connection) -> None: # Parses the selected games for a pgn
     selected_games_db_con = connect_db_from_pgn_path(pgn_path)
     selected_games_db_cur = selected_games_db_con.cursor()
     main_db_cur = main_db_con.cursor()
@@ -164,7 +164,7 @@ def main():
 
             return
 
-        case "clear-selected":
+        case "clear-selected": # (path)
             if len(sys.argv) == 2:
                 raise TypeError(("missing required argument \"path\" (pos 2)"))
             
@@ -186,7 +186,7 @@ def main():
 
             return
 
-        case "parse-selected":
+        case "parse-selected": # (path)
             if len(sys.argv) == 2:
                 raise TypeError(("missing required argument \"path\" (pos 2)"))
             
