@@ -79,14 +79,13 @@ def clear_db_table(db_con: sqlite3.Connection, table_name: str) -> None: # Clear
 
     return
 
-def game_data(game: chess.pgn.Game) -> list[(str, str, str)]: # Returns a list of tupples whith data for evry move in the game
+def game_data(game: chess.pgn.Game) -> list[(str, str)]: # Returns a list of tupples whith data for evry move in the game
     board = game.board()
 
     data = []
-    url = game.headers.get("Site")
 
     for move in game.mainline_moves():
-        data.append((board.fen(), move.uci(), url))
+        data.append((board.fen(), move.uci()))
         board.push(move)
 
     return data
@@ -119,7 +118,7 @@ def parse_selected_games(pgn_path: str, main_db_con: sqlite3.Connection) -> None
 
     for row in tqdm(selected_games_db_cur.execute("SELECT offset FROM selected_games").fetchall()):
         pgn.seek(row[0])
-        main_db_cur.executemany("INSERT INTO raw VALUES(?, ?, ?)", game_data(chess.pgn.read_game(pgn))) 
+        main_db_cur.executemany("INSERT INTO raw VALUES(?, ?)", game_data(chess.pgn.read_game(pgn))) 
         
     main_db_con.commit()
 
@@ -129,7 +128,7 @@ def main():
     con = sqlite3.connect(Path('lib') / 'data' / 'data.db')
     cur = con.cursor()
     if not db_table_exist(con, "raw"):
-        cur.execute("CREATE TABLE raw(board, move, url)")
+        cur.execute("CREATE TABLE raw(board, move)")
     
     if len(sys.argv) <= 2:
         raise TypeError("missing required argument \"operation\" (pos 1)")
