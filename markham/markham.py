@@ -120,8 +120,9 @@ def parse_selected_games(pgn_path: str, main_db_con: sqlite3.Connection) -> None
     for row in tqdm(selected_games_db_cur.execute("SELECT offset FROM selected_games").fetchall()):
         pgn.seek(row[0])
         main_db_cur.executemany("INSERT INTO raw VALUES(?, ?, ?)", game_data(chess.pgn.read_game(pgn))) 
-        main_db_con.commit()
         
+    main_db_con.commit()
+
     return
 
 def main():
