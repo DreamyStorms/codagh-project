@@ -6,7 +6,7 @@ import sqlite3
 from torch.utils.data import Dataset
 
 class ChessMovesDataset(Dataset):
-    def __init__(self, db_path, transform=None):
+    def __init__(self, db_path):
         self.db_con = sqlite3.connect(db_path)
     
     def __len__(self):
