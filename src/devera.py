@@ -8,7 +8,6 @@ from torch.utils.data import Dataset
 class ChessMovesDataset(Dataset):
     def __init__(self, db_path, transform=None):
         self.db_con = sqlite3.connect(db_path)
-        self.transform = transform
     
     def __len__(self):
         cur = self.db_con.cursor()
