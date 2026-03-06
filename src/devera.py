@@ -76,7 +76,7 @@ class ChessMovesDataset(Dataset):
         
         played_move = np.reshape(played_move, (8,8,11,8))
 
-        return {"position": torch.from_numpy(position_ndarray), "move": torch.from_numpy(played_move), "legal_moves": torch.from_numpy(legal_moves)}
+        return {"position": torch.tensor(position_ndarray).detach().float(), "move": torch.tensor(played_move).detach().float(), "legal_moves": torch.tensor(legal_moves).detach().float()}
 
 
 
