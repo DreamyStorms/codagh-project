@@ -13,8 +13,8 @@ def matrix_from_board(board: Board):
         matrix[piece_type + piece_color, row, col] = 1
     legal_moves = board.legal_moves
     for move in legal_moves:
-        matrix[12, divmod(move.from_square, 8)]
-        matrix[13, divmod(move.to_square, 8)]
+        matrix[12, divmod(move.from_square, 8)] = 1
+        matrix[13, divmod(move.to_square, 8)] = 1
     return matrix
 
 def generate_nn_input(games):
