@@ -3,7 +3,7 @@ from chess import Board
 from tqdm import tqdm
 
 def matrix_from_board(board: Board):
-    matrix = np.zeros((12, 8, 8))
+    matrix = np.zeros((14, 8, 8))
     piece_map = board.piece_map()
 
     for square, piece in piece_map.items():
@@ -11,7 +11,10 @@ def matrix_from_board(board: Board):
         piece_type = piece.piece_type - 1
         piece_color = 0 if piece.color else 6
         matrix[piece_type + piece_color, row, col] = 1
-
+    legal_moves = board.legal_moves
+    for move in legal_moves:
+        matrix[12, divmod(move.from_square, 8)]
+        matrix[13, divmod(move.to_square, 8)]
     return matrix
 
 def generate_nn_input(games):
@@ -23,7 +26,7 @@ def generate_nn_input(games):
             board.push(move)
 
 
-    positions = np.memmap(filename="../lib/data/npy/position.npy", dtype=np.float32, mode="w+", shape=(number_of_moves, 12, 8, 8))
+    positions = np.memmap(filename="../lib/data/npy/position.npy", dtype=np.float32, mode="w+", shape=(number_of_moves, 14, 8, 8))
     moves = np.memmap(filename="../lib/data/npy/moves.npy", dtype=np.float32, mode="w+", shape=(number_of_moves, 64, 64))
 
     i = 0
