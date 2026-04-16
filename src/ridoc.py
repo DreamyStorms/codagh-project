@@ -49,18 +49,22 @@ def generate_eval_lables(games):
             board.push(move)
     
     positions = np.memmap(filename="../lib/data/npy/eval_position.npy", dtype=np.float32, mode="w+", shape=(number_of_positions, 14, 8, 8))
-    results = np.memmap(filename="../lib/data/npy/reults.npy", dtype=np.float32, mode="w+", shape=(number_of_positions, 3))
+    results = np.memmap(filename="../lib/data/npy/reults.npy", dtype=np.float32, mode="w+", shape=(number_of_positions, 1))
     i = 0
     for game in tqdm(games):
-        result = 2
         board = game.board()
-        if game.headers["Result"] == "1-0":
-            result = 0
-        elif game.headers["Result"] == "0-1":
-            result = 1
+
+        match game.headers["Result"]:
+            case "1-0":
+                result = 1
+            case "0-1":
+                result = 0
+            case _:
+                result = 0.5
+                
         for move in game.mainline_moves():
             positions[i] = matrix_from_board(board)
-            results[i][result] = 1
+            results[i] = result
             i += 1
             board.push(move)
     

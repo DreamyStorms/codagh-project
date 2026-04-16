@@ -30,15 +30,18 @@ class EvalModel(nn.Module):
     def __init__(self):
         super(EvalModel, self).__init__()
         # conv1 -> relu -> conv2 -> relu -> flatten -> fc1 -> relu -> fc2 -> unflatten
-        self.conv1 = nn.Conv2d(14, 32, kernel_size=3, padding=1)
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(14, 14, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(14, 32, kernel_size=3, padding=1)
+        self.conv3 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
         self.flatten = nn.Flatten()
-        self.fc1 = nn.Linear(8 * 8 * 64, 128)
-        self.fc2 = nn.Linear(128, 3)
+        self.fc1 = nn.Linear(8 * 8 * 32, 64)
+        self.fc2 = nn.Linear(64, 1)
         self.relu = nn.ReLU()
+        self.sigmoid = nn.Sigmoid()
 
         nn.init.kaiming_uniform_(self.conv1.weight, nonlinearity='relu')
         nn.init.kaiming_uniform_(self.conv2.weight, nonlinearity='relu')
+        nn.init.kaiming_uniform_(self.conv3.weight, nonlinearity='relu')
         nn.init.xavier_uniform_(self.fc1.weight)
         nn.init.xavier_uniform_(self.fc2.weight)
 
@@ -47,5 +50,5 @@ class EvalModel(nn.Module):
         x = self.relu(self.conv2(x))
         x = self.flatten(x)
         x = self.relu(self.fc1(x))
-        x = self.fc2(x)
+        x = self.sigmoid(self.fc2(x))
         return(x)
